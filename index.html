@@ -69,7 +69,7 @@
     .small{font-size:12px;color:#93a3ba}
     .kbd{padding:2px 6px;border-radius:6px;border:1px solid #334155;background:#0b1222}
 
-    /* Canvas responsive (เต็มความกว้างการ์ด) */
+    /* Canvas responsive */
     canvas{display:block;width:100%;height:auto}
   </style>
 </head>
@@ -85,7 +85,7 @@
         <a href="#titration">จำลองไทเทรต</a>
         <a href="#quiz">แบบทดสอบ</a>
         <a href="#about">เกี่ยวกับ</a>
-        <button class="btn sec" style="padding:8px 12px" title="บันทึกหน้านี้เป็นไฟล์ .html" onclick="saveHTML()">บันทึกไฟล์ (.html)</button>
+        <!-- ปุ่มบันทึกไฟล์ถูกเอาออกตามคำขอ -->
       </div>
     </div>
   </nav>
@@ -99,7 +99,7 @@
       <div class="cta">
         <button class="btn" onclick="scrollToId('calc')">เริ่มคำนวณ pH</button>
         <button class="btn sec" onclick="scrollToId('learn')">อ่านสรุปก่อน</button>
-        <button class="btn sec" onclick="saveHTML()">บันทึกไฟล์ส่งงาน</button>
+        <!-- ปุ่มบันทึกไฟล์ถูกเอาออกตามคำขอ -->
       </div>
     </div>
     <div class="card">
@@ -231,12 +231,12 @@
           <li>เก็บสถิติคะแนนไว้ที่เบราว์เซอร์ (localStorage)</li>
           <li>โค้ดสะอาด แยกส่วน ฟังก์ชันพร้อมคอมเมนต์</li>
         </ul>
-        <div class="small">คลิกปุ่ม <b>บันทึกไฟล์ (.html)</b> ด้านบน เพื่อดาวน์โหลดหน้านี้เป็นไฟล์พร้อมส่งงาน (ระบบจะบันทึกสถานะที่แสดงบนหน้า ณ ตอนเซฟ)</div>
+        <div class="small">*หมายเหตุ: รองรับการอัปโหลดขึ้น GitHub Pages/Netlify หรือเปิดไฟล์ตรง ๆ ในเบราว์เซอร์</div>
       </div>
       <div class="card">
         <div><b>วิธีส่งงาน</b></div>
         <ol class="muted">
-          <li>บันทึกไฟล์เป็น <span class="kbd">index.html</span> ด้วยปุ่มบันทึกไฟล์</li>
+          <li>บันทึกไฟล์เป็น <span class="kbd">index.html</span></li>
           <li>อัปโหลดไปยัง GitHub Pages / Netlify หรือเปิดไฟล์ตรง ๆ ในเบราว์เซอร์</li>
           <li>แนบคู่มือผู้ใช้ (สั้น ๆ) และภาพหน้าจอ</li>
         </ol>
@@ -251,36 +251,17 @@
     const el = (id)=>document.getElementById(id);
     function scrollToId(id){document.querySelector('#'+id)?.scrollIntoView({behavior:'smooth'})}
 
-    // บันทึกไฟล์ HTML ทั้งหน้า (สถานะปัจจุบัน) เป็น .html เดียว
-    function saveHTML(){
-      try{
-        const stamp = new Date().toISOString().replace(/[:T]/g,'-').slice(0,19);
-        const comment = `<!-- Exported with ChemStudy Save @ ${stamp} -->\n`;
-        const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-        const blob = new Blob([comment + html], {type:'text/html;charset=utf-8'});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `ChemStudy_${stamp}.html`;
-        document.body.appendChild(a);
-        a.click();
-        URL.revokeObjectURL(a.href);
-        a.remove();
-      }catch(err){
-        alert('ไม่สามารถบันทึกไฟล์ได้: ' + err.message);
-      }
-    }
-
     // ---------- Canvas helpers (Responsive & Crisp) ----------
     function fitCanvasToParent(canvas, baseHeight=280){
       const dpr = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
       const widthCSS = canvas.clientWidth || rect.width || 520;
-      const heightCSS = baseHeight * (widthCSS / 520); // สัดส่วนคงที่ใกล้เคียงเดิม
+      const heightCSS = baseHeight * (widthCSS / 520);
       canvas.width = Math.max(320, Math.floor(widthCSS * dpr));
       canvas.height = Math.max(160, Math.floor(heightCSS * dpr));
       canvas.style.height = Math.round(heightCSS) + 'px';
       const ctx = canvas.getContext('2d');
-      ctx.setTransform(dpr,0,0,dpr,0,0); // scale สำหรับวาดด้วยพิกัด CSS
+      ctx.setTransform(dpr,0,0,dpr,0,0);
       return ctx;
     }
 
@@ -290,12 +271,11 @@
       const ctx = fitCanvasToParent(canvas, 280);
       const W = canvas.clientWidth, H = parseInt(canvas.style.height,10);
 
-      // axes
       ctx.clearRect(0,0,W,H);
       ctx.strokeStyle = '#334155'; ctx.lineWidth = 1; ctx.strokeRect(40,20,W-60,H-60);
       ctx.fillStyle = '#93a3ba'; ctx.font='12px system-ui';
       ctx.fillText('pH', 8, 28); ctx.fillText('Vb (mL)', W-70, H-16);
-      // curve
+
       ctx.beginPath(); ctx.lineWidth = 2; ctx.strokeStyle = '#fb923c';
       const n=120;
       for(let i=0;i<n;i++){
@@ -307,7 +287,6 @@
       }
       ctx.stroke();
     }
-    // initial draw + on resize
     drawHero(); window.addEventListener('resize', drawHero);
 
     // ---------- pH Calculator ----------
@@ -344,19 +323,17 @@
       const molB = Cb*(Vb/1000); // added moles OH-
       const Vt = (Va+Vb)/1000;   // total volume L
       if(molB < molA){
-        const H = (molA-molB)/Vt; return -Math.log10(H);            // ก่อนจุดสมมูล (กรดเกิน)
+        const H = (molA-molB)/Vt; return -Math.log10(H);
       } else if (Math.abs(molB-molA) < 1e-12){
-        return 7;                                                    // จุดสมมูล (กรดแก่-เบสแก่) ที่ 25°C
+        return 7;
       } else {
-        const OH = (molB-molA)/Vt; const pOH = -Math.log10(OH); return 14 - pOH; // หลังจุดสมมูล (เบสเกิน)
+        const OH = (molB-molA)/Vt; const pOH = -Math.log10(OH); return 14 - pOH;
       }
     }
 
     function runTitration(){
       const Ca = parseFloat(el('Ca').value), Va=parseFloat(el('Va').value), Cb=parseFloat(el('Cb').value), Vb=parseFloat(el('Vb').value);
-      if([Ca,Va,Cb,Vb].some(x=>Number.isNaN(x) || (x<=0 && x!==0))){
-        el('titOut').innerHTML='<span class="muted">กรุณาใส่ค่าถูกต้อง</span>'; return;
-      }
+      if([Ca,Va,Cb,Vb].some(x=>Number.isNaN(x) || (x<=0 && x!==0))){el('titOut').innerHTML='<span class="muted">กรุณาใส่ค่าถูกต้อง</span>'; return}
       const pH = pHstrongAcidBase(Ca,Va,Cb,Vb);
       const Veq = (Ca*Va)/Cb; // mL
       el('titOut').innerHTML = `pH = <b>${pH.toFixed(2)}</b> (V<sub>eq</sub> ≈ ${Veq.toFixed(2)} mL)`;
@@ -368,31 +345,23 @@
       const ctx = fitCanvasToParent(canvas, 280);
       const W = canvas.clientWidth, H = parseInt(canvas.style.height,10);
 
-      // axes
       ctx.clearRect(0,0,W,H);
       ctx.strokeStyle='#334155'; ctx.lineWidth=1; ctx.strokeRect(40,20,W-60,H-60);
       ctx.fillStyle='#93a3ba'; ctx.font='12px system-ui'; ctx.fillText('pH',8,28); ctx.fillText('Vb (mL)',W-66,H-16);
 
-      // compute
       const Vmax = Va*2.2; const N=160; let pts=[];
-      for(let i=0;i<N;i++){
-        const Vb=i/(N-1)*Vmax; const pH=pHstrongAcidBase(Ca,Va,Cb,Vb); pts.push([Vb,pH]);
-      }
+      for(let i=0;i<N;i++){const Vb=i/(N-1)*Vmax; const pH=pHstrongAcidBase(Ca,Va,Cb,Vb); pts.push([Vb,pH])}
       const x2px = v=>40 + v/Vmax*(W-60);
       const y2px = v=> H-40 - Math.max(0,Math.min(14,v))/14*(H-60);
 
-      // curve
       ctx.beginPath(); ctx.lineWidth=2; ctx.strokeStyle='#f59e0b';
-      pts.forEach(([x,y],i)=>{const px=x2px(x), py=y2px(y); if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py)});
-      ctx.stroke();
+      pts.forEach(([x,y],i)=>{const px=x2px(x), py=y2px(y); if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py)}); ctx.stroke();
 
-      // equivalence line
       const Veq=(Ca*Va)/Cb; const ex=x2px(Veq);
       ctx.setLineDash([4,4]); ctx.strokeStyle='#475569'; ctx.beginPath(); ctx.moveTo(ex,20); ctx.lineTo(ex,H-40); ctx.stroke(); ctx.setLineDash([]);
       ctx.fillStyle='#93a3ba'; ctx.fillText('Veq', ex-12, H-44);
     }
 
-    // redraw titration curve responsively when resizing (if already plotted once)
     let plottedOnce = false;
     const origPlotCurve = plotCurve;
     plotCurve = function(){ plottedOnce = true; origPlotCurve(); }
@@ -426,7 +395,6 @@
       el('submitQuiz').addEventListener('click', gradeQuiz);
       el('resetQuiz').addEventListener('click', resetQuiz);
 
-      // โหลดคะแนนล่าสุด (ถ้ามี)
       try{
         const prev = localStorage.getItem('chem_quiz_score');
         if(prev!=null){ el('quizMsg').textContent = `คะแนนครั้งก่อนของคุณ: ${prev}/${QUIZ.length}`; }
@@ -462,7 +430,6 @@
 
     renderQuiz();
 
-    // hash navigation (optional deep-link)
     if(location.hash){ const id=location.hash.replace('#',''); setTimeout(()=>scrollToId(id), 200); }
   </script>
 </body>
