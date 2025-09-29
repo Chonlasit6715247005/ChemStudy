@@ -3,180 +3,392 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ChemStudy – pH Project</title>
+  <title>ChemStudy • สื่อการเรียนเคมี (pH, กรด–เบส, ไทเทรต, Quiz)</title>
   <style>
-    :root {
-      --bg: #0f172a;
-      --panel: #111827;
-      --ink: #e5e7eb;
-      --brand: #f59e0b;
-      --muted: #94a3b8;
-      --card: #1e293b;
+    :root{
+      --bg:#0f172a;       /* slate-900 */
+      --panel:#111827;    /* gray-900 */
+      --ink:#e5e7eb;      /* gray-200 */
+      --muted:#94a3b8;    /* slate-400 */
+      --brand:#f59e0b;    /* amber-500 */
+      --brand-2:#fb923c;  /* orange-400 */
+      --good:#10b981;     /* emerald-500 */
+      --bad:#ef4444;      /* red-500 */
+      --mid:#3b82f6;      /* blue-500 */
+      --card:#0b1222;     
     }
-    body {
-      margin:0;
-      font-family: system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--ink);
-      line-height:1.6;
-    }
-    header, nav, main {padding:1rem;}
-    header {background: var(--panel);display:flex;align-items:center;justify-content:space-between;}
-    nav a {margin:0 .5rem;color:var(--ink);text-decoration:none;font-weight:500;}
-    .hero {padding:2rem;text-align:center;}
-    .grid {display:grid;gap:1rem;}
-    .grid.cols-3{grid-template-columns:repeat(auto-fit,minmax(250px,1fr));}
-    .card {background:var(--card);padding:1rem;border-radius:12px;}
-    h2 {margin-top:2rem;color:var(--brand)}
-    input,select,button{padding:.5rem;margin:.25rem;border-radius:8px;border:none}
-    button{background:var(--brand);color:#000;font-weight:bold;cursor:pointer}
-    canvas{width:100%;height:auto;display:block}
-    @media(max-width:640px){
-      nav {display:none;}
-      .nav-toggle{display:block;cursor:pointer}
-    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:linear-gradient(180deg,var(--bg),#060a17);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:1100px;margin:auto;padding:24px}
+    .nav{position:sticky;top:0;z-index:50;background:rgba(15,23,42,.7);backdrop-filter:blur(8px);border-bottom:1px solid #1f2937}
+    .navwrap{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px 24px}
+    .logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px}
+    .logo-badge{width:34px;height:34px;border-radius:12px;background:conic-gradient(from 200deg at 50% 50%, var(--brand), var(--brand-2));display:grid;place-items:center;color:#111;font-weight:900}
+    .nav a{opacity:.9;padding:8px 12px;border-radius:10px}
+    .nav a:hover{background:#1f2937}
+
+    .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center;padding:48px 24px}
+    .hero h1{font-size:38px;line-height:1.2;margin:0}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 12px;background:#1f2937;border:1px solid #263244;border-radius:999px;color:var(--muted);font-size:14px}
+    .cta{display:flex;gap:12px;margin-top:16px}
+    .btn{background:linear-gradient(180deg,var(--brand-2),var(--brand));color:#111;padding:10px 16px;border-radius:12px;border:none;font-weight:700;cursor:pointer}
+    .btn.sec{background:#1f2937;color:var(--ink);border:1px solid #263244}
+    .card{background:radial-gradient(1200px 300px at -10% -20%, rgba(245,158,11,.15), transparent 40%), #0b1222;border:1px solid #1f2739;border-radius:18px;padding:18px}
+
+    h2.section{font-size:26px;margin:40px 0 16px}
+    .grid{display:grid;gap:16px}
+    @media (min-width:900px){.grid.cols-3{grid-template-columns:repeat(3,1fr)}.grid.cols-2{grid-template-columns:repeat(2,1fr)}}
+
+    .accordion summary{cursor:pointer;list-style:none}
+    .accordion summary::-webkit-details-marker{display:none}
+    .accordion .title{display:flex;justify-content:space-between;align-items:center;font-weight:700}
+    .tag{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #2b3750;color:var(--muted)}
+
+    .scale{height:18px;border-radius:999px;background:linear-gradient(90deg,#7c2222,#ef4444,#f59e0b,#22c55e,#3b82f6,#1d4ed8,#312e81)}
+    .marker{position:relative;height:0}
+    .marker span{position:absolute;top:-8px;width:2px;height:34px;background:#fff;border-radius:1px}
+
+    input,select{background:#0f172a;border:1px solid #233147;border-radius:10px;color:var(--ink);padding:10px;width:100%}
+    label{font-size:14px;color:var(--muted)}
+    .row{display:grid;gap:12px}
+    @media (min-width:720px){.row.cols-2{grid-template-columns:1fr 1fr}}
+
+    .quiz-q{border-bottom:1px dashed #263244;padding-bottom:12px;margin-bottom:12px}
+    .answer{display:block;margin:6px 0;padding:8px 10px;border-radius:10px;border:1px solid #243349;cursor:pointer}
+    .answer.correct{background:rgba(16,185,129,.12);border-color:var(--good)}
+    .answer.wrong{background:rgba(239,68,68,.1);border-color:var(--bad)}
+    .muted{color:var(--muted)}
+    .foot{padding:40px 24px;color:#93a3ba;text-align:center;border-top:1px solid #1f2937}
+    .small{font-size:12px;color:#93a3ba}
+    .kbd{padding:2px 6px;border-radius:6px;border:1px solid #334155;background:#0b1222}
   </style>
 </head>
 <body>
-<header>
-  <div><b style="color:var(--brand)">ChemStudy</b></div>
-  <div class="nav-toggle" onclick="toggleNav()">☰</div>
-  <nav id="menu">
-    <a href="#learn">สรุปเนื้อหา</a>
-    <a href="#calc">คำนวณ pH</a>
-    <a href="#tit">จำลองไทเทรต</a>
-    <a href="#quiz">แบบทดสอบ</a>
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="navwrap">
+      <div class="logo"><div class="logo-badge">E·L</div> ChemStudy</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a href="#home">หน้าแรก</a>
+        <a href="#learn">สรุปเนื้อหา</a>
+        <a href="#calc">คำนวณ pH</a>
+        <a href="#titration">จำลองไทเทรต</a>
+        <a href="#quiz">แบบทดสอบ</a>
+        <a href="#about">เกี่ยวกับ</a>
+      </div>
+    </div>
   </nav>
-</header>
-<main>
-  <section class="hero">
-    <h1>เรียนเคมีให้เข้าใจง่าย</h1>
-    <p>เว็บเดียวครบทั้ง สรุป • คำนวณ • แบบทดสอบ</p>
+
+  <!-- HERO -->
+  <section id="home" class="container hero">
+    <div>
+      <span class="pill">สื่อการเรียนเคมี • กรด–เบส • pH • ไทเทรชัน</span>
+      <h1>เรียนเคมีให้สนุก เข้าใจไว ด้วยเว็บเดียวครบทั้ง <span style="color:var(--brand)">สรุป</span> <span style="color:var(--good)">คำนวณ</span> และ <span style="color:var(--mid)">แบบทดสอบ</span></h1>
+      <p class="muted">เหมาะสำหรับส่งโปรเจ็ค/ใช้ประกอบการเรียน หน่วยการเรียนรู้: ค่า pH, ทฤษฎีกรด–เบส, การไทเทรต, กราฟ pH‑scale แบบโต้ตอบ และ Quiz ตรวจทันที</p>
+      <div class="cta">
+        <button class="btn" onclick="scrollToId('calc')">เริ่มคำนวณ pH</button>
+        <button class="btn sec" onclick="scrollToId('learn')">อ่านสรุปก่อน</button>
+      </div>
+    </div>
+    <div class="card">
+      <canvas id="heroPlot" width="520" height="280" aria-label="pH scale"></canvas>
+      <div class="small" style="margin-top:6px">กราฟตัวอย่าง: โค้งไทเทรตกรดแก่–เบสแก่</div>
+    </div>
   </section>
 
-  <section id="learn">
-    <h2>📖 สรุปเนื้อหาสำคัญ</h2>
+  <!-- LEARN -->
+  <section id="learn" class="container">
+    <h2 class="section">📚 สรุปเนื้อหาสำคัญ</h2>
     <div class="grid cols-3">
-      <div class="card">
-        <h3>ค่า pH และ pOH</h3>
-        <p>pH = -log10[H⁺], pOH = -log10[OH⁻], pH + pOH = 14</p>
-        <p>pH < 7 = กรด, pH = 7 = กลาง, pH > 7 = เบส</p>
-      </div>
-      <div class="card">
-        <h3>ทฤษฎีกรด–เบส</h3>
-        <p>Arrhenius: กรดให้ H⁺, เบสให้ OH⁻</p>
-        <p>Brønsted–Lowry: กรด = proton donor, เบส = proton acceptor</p>
-        <p>Lewis: กรด = electron acceptor, เบส = electron donor</p>
-      </div>
-      <div class="card">
-        <h3>การไทเทรต</h3>
-        <p>การไทเทรตคือการหาความเข้มข้นสาร โดยใช้สารมาตรฐานทำปฏิกิริยาจนสมดุล</p>
-      </div>
+      <details class="card accordion" open>
+        <summary class="title">ค่า pH และ pOH <span class="tag">พื้นฐาน</span></summary>
+        <div class="muted">
+          <ul>
+            <li>นิยาม: <code>pH = -log10[H⁺]</code>, <code>pOH = -log10[OH⁻]</code>, และ <code>pH + pOH = 14</code> (ที่ 25 °C)</li>
+            <li>จำแนกสาร: pH &lt; 7 = กรด, pH = 7 = กลาง, pH &gt; 7 = เบส</li>
+            <li>ความเข้มข้น [H⁺] มีหน่วยเป็น mol·L⁻¹ (M)</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="card accordion">
+        <summary class="title">ทฤษฎีกรด–เบส <span class="tag">แนวคิด</span></summary>
+        <div class="muted">
+          <ul>
+            <li>Arrhenius: กรดให้ H⁺ ในสารละลาย, เบสให้ OH⁻</li>
+            <li>Brønsted–Lowry: กรดเป็นผู้ให้โปรตอน, เบสเป็นผู้รับโปรตอน</li>
+            <li>Lewis: กรดรับ e‑pair, เบสให้ e‑pair</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="card accordion">
+        <summary class="title">การไทเทรต (Titration) <span class="tag">ปฏิบัติ</span></summary>
+        <div class="muted">
+          <ul>
+            <li>เป้าหมาย: หาโมล/ความเข้มข้นของสารไม่ทราบค่า ด้วยสารมาตรฐาน</li>
+            <li>จุดสมมูล (Equivalence): โมลกรด = โมลเบส</li>
+            <li>จุดยุติ (Endpoint): ตัวบ่งชี้เปลี่ยนสี ≈ จุดสมมูล</li>
+          </ul>
+        </div>
+      </details>
     </div>
   </section>
 
-  <section id="calc">
-    <h2>🧮 เครื่องคำนวณ pH/pOH</h2>
+  <!-- CALCULATOR -->
+  <section id="calc" class="container">
+    <h2 class="section">🧮 เครื่องคำนวณค่า pH/pOH</h2>
     <div class="card">
-      <label>เลือกชนิดค่า:</label>
-      <select id="type">
-        <option value="h">[H⁺]</option>
-        <option value="oh">[OH⁻]</option>
-        <option value="ph">pH</option>
-        <option value="poh">pOH</option>
-      </select>
-      <input id="val" type="number" step="any" placeholder="กรอกค่า">
-      <button onclick="calcPH()">คำนวณ</button>
-      <p id="calcOut"></p>
+      <div class="row cols-2">
+        <div>
+          <label>ชนิดที่รู้ค่า</label>
+          <select id="knownType">
+            <option value="H">[H⁺] (M)</option>
+            <option value="OH">[OH⁻] (M)</option>
+            <option value="pH">pH</option>
+            <option value="pOH">pOH</option>
+          </select>
+        </div>
+        <div>
+          <label>ค่า</label>
+          <input id="knownValue" type="number" step="any" placeholder="เช่น 1e-3 หรือ 3.5" />
+        </div>
+      </div>
+      <div class="row cols-2" style="margin-top:12px">
+        <div>
+          <button class="btn" onclick="calcPH()">คำนวณ</button>
+          <button class="btn sec" onclick="resetPH()">ล้างค่า</button>
+        </div>
+        <div class="muted" id="phWarn">หมายเหตุ: ใช้สมมติฐาน 25 °C (Kw = 1.0×10⁻¹⁴)</div>
+      </div>
+      <div style="margin-top:16px">
+        <div class="scale" aria-hidden="true"></div>
+        <div class="marker"><span id="phMarker" style="left:50%"></span></div>
+      </div>
+      <div id="phOut" style="margin-top:12px"></div>
     </div>
   </section>
 
-  <section id="tit">
-    <h2>⚗️ จำลองการไทเทรต</h2>
+  <!-- TITRATION SIM -->
+  <section id="titration" class="container">
+    <h2 class="section">⚗️ จำลองการไทเทรต (กรดแก่–เบสแก่)</h2>
     <div class="card">
-      <label>Ca (M): <input id="Ca" value="0.1"></label>
-      <label>Va (mL): <input id="Va" value="25"></label>
-      <label>Cb (M): <input id="Cb" value="0.1"></label>
-      <button onclick="plotCurve()">พล็อตกราฟ</button>
-      <canvas id="titPlot"></canvas>
+      <div class="row cols-2">
+        <div>
+          <label>กรดเริ่มต้น C<sub>a</sub> (M)</label>
+          <input id="Ca" type="number" step="any" value="0.1" />
+        </div>
+        <div>
+          <label>ปริมาตรกรด V<sub>a</sub> (mL)</label>
+          <input id="Va" type="number" step="any" value="25" />
+        </div>
+      </div>
+      <div class="row cols-2" style="margin-top:8px">
+        <div>
+          <label>เบสไทเทรต C<sub>b</sub> (M)</label>
+          <input id="Cb" type="number" step="any" value="0.1" />
+        </div>
+        <div>
+          <label>ปริมาตรเบสที่เติม V<sub>b</sub> (mL)</label>
+          <input id="Vb" type="number" step="any" value="0" />
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <button class="btn" onclick="runTitration()">คำนวณ pH</button>
+        <button class="btn sec" onclick="plotCurve()">พล็อตโค้งไทเทรต</button>
+      </div>
+      <div id="titOut" style="margin-top:12px"></div>
+      <canvas id="titPlot" width="900" height="280" style="margin-top:12px"></canvas>
     </div>
   </section>
 
-  <section id="quiz">
-    <h2>📝 แบบทดสอบ</h2>
-    <div id="quizBox" class="card"></div>
+  <!-- QUIZ -->
+  <section id="quiz" class="container">
+    <h2 class="section">📝 แบบทดสอบสั้น ๆ</h2>
+    <div id="quizWrap" class="card"></div>
   </section>
-</main>
-<script>
-function toggleNav(){
-  const nav=document.getElementById('menu');
-  nav.style.display= nav.style.display==='block'? 'none':'block';
-}
 
-function calcPH(){
-  const t=document.getElementById('type').value;
-  const v=parseFloat(document.getElementById('val').value);
-  if(isNaN(v)||v<=0){document.getElementById('calcOut').textContent='กรุณาใส่ค่าที่ถูกต้อง';return;}
-  let ph, poh;
-  if(t==='h'){ph=-Math.log10(v);poh=14-ph;}
-  else if(t==='oh'){poh=-Math.log10(v);ph=14-poh;}
-  else if(t==='ph'){ph=v;poh=14-v;}
-  else{poh=v;ph=14-v;}
-  document.getElementById('calcOut').textContent=`pH = ${ph.toFixed(2)}, pOH = ${poh.toFixed(2)}`;
-}
+  <!-- ABOUT -->
+  <section id="about" class="container">
+    <h2 class="section">ℹ️ เกี่ยวกับโปรเจ็ค</h2>
+    <div class="grid cols-2">
+      <div class="card">
+        <b>ChemStudy</b> เป็นเว็บสื่อการเรียนรู้เคมีสำหรับหัวข้อกรด–เบสและการไทเทรต เหมาะกับการใช้งานในชั้นเรียน/ส่งงานโปรเจ็ค สามารถรันได้ในไฟล์เดียว (HTML เดียวนี้)
+        <ul class="muted">
+          <li>รองรับออฟไลน์: เปิดไฟล์นี้ก็ใช้งานส่วนใหญ่ได้ทันที</li>
+          <li>เก็บสถิติคะแนนไว้ที่เบราว์เซอร์ (localStorage)</li>
+          <li>โค้ดสะอาด แยกส่วน ฟังก์ชันพร้อมคอมเมนต์</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div><b>วิธีส่งงาน</b></div>
+        <ol class="muted">
+          <li>บันทึกไฟล์เป็น <span class="kbd">index.html</span></li>
+          <li>อัปโหลดไปยัง GitHub Pages / Netlify หรือเปิดตรง ๆ ในเบราว์เซอร์</li>
+          <li>แนบคู่มือผู้ใช้ (สั้น ๆ) และภาพหน้าจอ</li>
+        </ol>
+      </div>
+    </div>
+  </section>
 
-function pHstrongAcidBase(Ca,Va,Cb,Vb){
-  const nH=Ca*Va/1000; const nOH=Cb*Vb/1000;
-  const V=(Va+Vb)/1000;
-  if(nH>nOH){const h=(nH-nOH)/V; return -Math.log10(h);} 
-  else if(nOH>nH){const oh=(nOH-nH)/V; return 14+Math.log10(oh);} 
-  else return 7;
-}
+  <footer class="foot small">ChemStudy © 2025 • สร้างเพื่อการเรียนรู้</footer>
 
-function plotCurve(){
-  const Ca=parseFloat(document.getElementById('Ca').value);
-  const Va=parseFloat(document.getElementById('Va').value);
-  const Cb=parseFloat(document.getElementById('Cb').value);
-  const ctx=document.getElementById('titPlot').getContext('2d');
-  const W=ctx.canvas.width=ctx.canvas.clientWidth*window.devicePixelRatio;
-  const H=ctx.canvas.height=300*window.devicePixelRatio;
-  ctx.scale(window.devicePixelRatio,window.devicePixelRatio);
-  ctx.clearRect(0,0,W,H);
-  ctx.strokeStyle='#f59e0b';ctx.lineWidth=2;
-  const Vmax=Va*2.2; ctx.beginPath();
-  for(let i=0;i<=100;i++){
-    const Vb=i/100*Vmax; const pH=pHstrongAcidBase(Ca,Va,Cb,Vb);
-    const x=i/100*W/window.devicePixelRatio; 
-    const y=H/window.devicePixelRatio-(pH/14*H/window.devicePixelRatio);
-    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-  }
-  ctx.stroke();
-}
+  <script>
+    // ---------- Utilities ----------
+    const el = (id)=>document.getElementById(id);
+    function scrollToId(id){document.querySelector('#'+id)?.scrollIntoView({behavior:'smooth'})}
 
-const quiz=[
- {q:'pH = 7 แสดงว่าสารมีสมบัติอะไร?',c:['กรด','กลาง','เบส'],a:1},
- {q:'ถ้า [H⁺] = 1e-3 M ค่า pH เท่ากับ?',c:['2','3','4'],a:1},
- {q:'ทฤษฎีใดกล่าวว่า กรดคือ Proton donor?',c:['Arrhenius','Brønsted–Lowry','Lewis'],a:1},
- {q:'NaOH เป็น?',c:['กรดแก่','เบสแก่','กลาง'],a:1},
-];
-function renderQuiz(){
-  const box=document.getElementById('quizBox');
-  box.innerHTML='';
-  quiz.forEach((item,i)=>{
-    const d=document.createElement('div');
-    d.innerHTML=`<p>${i+1}. ${item.q}</p>`;
-    item.c.forEach((c,j)=>{
-      const b=document.createElement('button');
-      b.textContent=c;
-      b.onclick=()=>{
-        if(j===item.a) alert('ถูกต้อง!'); else alert('ผิด ลองใหม่');
-      };
-      d.appendChild(b);
-    });
-    box.appendChild(d);
-  });
-}
-renderQuiz();
-</script>
+    // ---------- Hero demo plot (titration curve) ----------
+    const heroCtx = document.getElementById('heroPlot').getContext('2d');
+    function drawHero(){
+      const ctx = heroCtx; const W = ctx.canvas.width, H = ctx.canvas.height;
+      ctx.clearRect(0,0,W,H);
+      // axes
+      ctx.strokeStyle = '#334155'; ctx.lineWidth = 1; ctx.strokeRect(40,20,W-60,H-60);
+      ctx.fillStyle = '#93a3ba'; ctx.font='12px system-ui';
+      ctx.fillText('pH', 8, 28); ctx.fillText('Vb (mL)', W-70, H-16);
+      // mock curve
+      ctx.beginPath(); ctx.lineWidth = 2; ctx.strokeStyle = '#fb923c';
+      const n=120; for(let i=0;i<n;i++){const x=i/(n-1);const y= 1/(1+Math.exp(-12*(x-0.5))); const px = 40 + x*(W-60); const py= H-40 - (y*(H-60)); if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);} ctx.stroke();
+    }
+    drawHero();
+
+    // ---------- pH Calculator ----------
+    function calcPH(){
+      const type = el('knownType').value; let v = parseFloat(el('knownValue').value);
+      const Kw = 1e-14; // at 25 C
+      if(Number.isNaN(v) || !isFinite(v) || v<=0 && (type==='H'||type==='OH')){el('phOut').innerHTML = '<span class="muted">กรุณากรอกค่าถูกต้อง</span>'; return;}
+      let H, OH, pH, pOH;
+      if(type==='H'){H=v; pH = -Math.log10(H); OH = Kw/H; pOH = -Math.log10(OH)}
+      else if(type==='OH'){OH=v; pOH=-Math.log10(OH); H=Kw/OH; pH=-Math.log10(H)}
+      else if(type==='pH'){pH=v; H=10**(-pH); OH=Kw/H; pOH=-Math.log10(OH)}
+      else {pOH=v; OH=10**(-pOH); H=Kw/OH; pH=-Math.log10(H)}
+      const kind = pH<7? 'กรด' : pH>7? 'เบส' : 'กลาง';
+      const pos = Math.max(0, Math.min(14, pH))/14*100;
+      el('phMarker').style.left = pos+'%';
+      el('phOut').innerHTML = `
+        <div class="grid cols-2">
+          <div class="card">
+            <b>ผลลัพธ์</b>
+            <div>pH = <b>${pH.toFixed(2)}</b> • pOH = <b>${pOH.toFixed(2)}</b></div>
+            <div>[H⁺] = ${H.toExponential(2)} M • [OH⁻] = ${OH.toExponential(2)} M</div>
+            <div>ลักษณะสาร: <b>${kind}</b></div>
+          </div>
+          <div class="card muted">คำแนะนำ: สำหรับสารละลายเข้มข้นมาก/เจือจางมาก อาจต้องพิจารณาอิออนไฮโดรเนียมจากน้ำหรือกิจกรรมของไอออน</div>
+        </div>`;
+    }
+    function resetPH(){el('knownValue').value=''; el('phOut').innerHTML=''; el('phMarker').style.left='50%'}
+
+    // ---------- Titration (Strong acid vs strong base) ----------
+    function pHstrongAcidBase(Ca,Va,Cb,Vb){
+      // All volumes in mL, convert to L when multiply by concentrations
+      const molA = Ca*(Va/1000); // initial moles H+
+      const molB = Cb*(Vb/1000); // added moles OH-
+      const Vt = (Va+Vb)/1000;   // total volume L
+      const Kw = 1e-14;
+      if(molB < molA){
+        // before equivalence -> excess acid
+        const H = (molA-molB)/Vt; return -Math.log10(H);
+      } else if (Math.abs(molB-molA) < 1e-12){
+        // at equivalence for strong/strong -> pH=7 at 25C
+        return 7;
+      } else {
+        // after equivalence -> excess base
+        const OH = (molB-molA)/Vt; const pOH = -Math.log10(OH); return 14 - pOH;
+      }
+    }
+
+    function runTitration(){
+      const Ca = parseFloat(el('Ca').value), Va=parseFloat(el('Va').value), Cb=parseFloat(el('Cb').value), Vb=parseFloat(el('Vb').value);
+      if([Ca,Va,Cb,Vb].some(x=>Number.isNaN(x) || x<=0 && x!==0)){el('titOut').innerHTML='<span class="muted">กรุณาใส่ค่าถูกต้อง</span>'; return}
+      const pH = pHstrongAcidBase(Ca,Va,Cb,Vb);
+      const Veq = (Ca*Va)/Cb; // mL
+      el('titOut').innerHTML = `pH = <b>${pH.toFixed(2)}</b> (V<sub>eq</sub> ≈ ${Veq.toFixed(2)} mL)`;
+    }
+
+    function plotCurve(){
+      const Ca = parseFloat(el('Ca').value), Va=parseFloat(el('Va').value), Cb=parseFloat(el('Cb').value);
+      const ctx = document.getElementById('titPlot').getContext('2d');
+      const W=ctx.canvas.width, H=ctx.canvas.height; ctx.clearRect(0,0,W,H);
+      // axes
+      ctx.strokeStyle='#334155'; ctx.lineWidth=1; ctx.strokeRect(40,20,W-60,H-60);
+      ctx.fillStyle='#93a3ba'; ctx.font='12px system-ui'; ctx.fillText('pH',8,28); ctx.fillText('Vb (mL)',W-66,H-16);
+      // compute
+      const Vmax = Va*2.2; const N=160; let pts=[]; for(let i=0;i<N;i++){const Vb=i/(N-1)*Vmax; const pH=pHstrongAcidBase(Ca,Va,Cb,Vb); pts.push([Vb,pH])}
+      // scale helpers
+      const x2px = v=>40 + v/Vmax*(W-60);
+      const y2px = v=> H-40 - Math.max(0,Math.min(14,v))/14*(H-60);
+      // curve
+      ctx.beginPath(); ctx.lineWidth=2; ctx.strokeStyle='#f59e0b';
+      pts.forEach(([x,y],i)=>{const px=x2px(x), py=y2px(y); if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py)}); ctx.stroke();
+      // equivalence line
+      const Veq=(Ca*Va)/Cb; const ex=x2px(Veq);
+      ctx.setLineDash([4,4]); ctx.strokeStyle='#475569'; ctx.beginPath(); ctx.moveTo(ex,20); ctx.lineTo(ex,H-40); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle='#93a3ba'; ctx.fillText('Veq', ex-12, H-44);
+    }
+
+    // ---------- QUIZ ----------
+    const QUIZ = [
+      {q:'นิยามของ pH คือข้อใด', choices:['-log10[H⁺]','log10[H⁺]','-ln[H⁺]','1/[H⁺]'], a:0, exp:'pH = -log10[H⁺] (ฐาน 10)'},
+      {q:'ที่ 25°C ค่าคงที่น้ำ (Kw) เท่าไร', choices:['1×10⁻¹²','1×10⁻¹⁴','1×10⁻⁷','1×10¹⁴'], a:1, exp:'Kw = [H⁺][OH⁻] = 1×10⁻¹⁴'},
+      {q:'สารมี pH = 3 จัดเป็น', choices:['เบสอ่อน','กรดแก่','กรด','กลาง'], a:2, exp:'pH<7 เป็นกรด (ความแรงไม่ชี้จาก pH อย่างเดียว)'},
+      {q:'ทฤษฎีใดกำหนดกรดคือผู้รับคู่อิเล็กตรอน', choices:['Arrhenius','Brønsted–Lowry','Lewis','None'], a:2, exp:'Lewis acid = electron pair acceptor'},
+      {q:'จุดสมมูลในการไทเทรตคือ', choices:['ตัวบ่งชี้เปลี่ยนสี','โมลกรด = โมลเบส','pH=7 เสมอ','พอดีกับ 25 mL'], a:1, exp:'นิยามคือจำนวนโมลเท่ากัน'},
+      {q:'ถ้ารู้ค่า pOH = 5 ที่ 25°C ค่า pH เท่ากับ', choices:['9','5','7','10'], a:0, exp:'pH = 14 - pOH = 9'},
+      {q:'การเลือกตัวบ่งชี้ (indicator) ควรพิจารณา', choices:['ช่วงเปลี่ยนสีใกล้ช่วงเปลี่ยน pH รวดเร็ว','สีที่ชอบ','ราคาถูกสุด','ยี่ห้อดัง'], a:0, exp:'ต้องสอดคล้องช่วงกระโดดของ pH'},
+      {q:'คู่ใดเป็นกรด–เบสตาม Brønsted–Lowry', choices:['HCl / NaCl','NH₄⁺ / NH₃','H₂O / Cl⁻','Na⁺ / Cl⁻'], a:1, exp:'NH₄⁺ ให้โปรตอน → NH₃ รับโปรตอน'}
+    ];
+
+    function renderQuiz(){
+      const wrap = el('quizWrap');
+      let html = '';
+      QUIZ.forEach((it,idx)=>{
+        html += `<div class="quiz-q"><b>ข้อ ${idx+1}.</b> ${it.q}`;
+        it.choices.forEach((c,i)=>{
+          html += `<label class="answer" data-q="${idx}" data-i="${i}">${String.fromCharCode(65+i)}. ${c}</label>`
+        });
+        html += `<div class="small muted" id="exp-${idx}"></div></div>`
+      });
+      html += `<button class="btn" id="submitQuiz">ตรวจคำตอบ</button> <button class="btn sec" id="resetQuiz">เริ่มใหม่</button> <span class="muted small" id="quizMsg"></span>`
+      wrap.innerHTML = html;
+      wrap.addEventListener('click', onPick, false);
+      el('submitQuiz').addEventListener('click', gradeQuiz);
+      el('resetQuiz').addEventListener('click', resetQuiz);
+    }
+
+    function onPick(e){
+      const lab = e.target.closest('.answer'); if(!lab) return;
+      const q = +lab.dataset.q, i = +lab.dataset.i;
+      // clear previous selection styles for that question
+      document.querySelectorAll(`.answer[data-q="${q}"]`).forEach(n=>{n.classList.remove('correct','wrong'); n.style.outline='none'});
+      lab.style.outline='2px solid #475569'; lab.dataset.sel = '1';
+      lab.parentElement.querySelectorAll('.answer').forEach((n,idx)=>{ n.dataset.selected = (idx===i? '1':'0') });
+    }
+
+    function gradeQuiz(){
+      let score=0;
+      QUIZ.forEach((it,idx)=>{
+        const nodes = document.querySelectorAll(`.answer[data-q="${idx}"]`);
+        nodes.forEach((n,i)=>{
+          if(i===it.a && n.dataset.selected==='1'){ n.classList.add('correct'); score++; }
+          else if(n.dataset.selected==='1'){ n.classList.add('wrong'); }
+        });
+        el(`exp-${idx}`).textContent = 'อธิบาย: '+it.exp;
+      });
+      const msg = `คะแนนของคุณ ${score}/${QUIZ.length}`;
+      el('quizMsg').textContent = msg;
+      try{ localStorage.setItem('chem_quiz_score', String(score)); }catch{}
+    }
+
+    function resetQuiz(){
+      renderQuiz(); el('quizMsg').textContent='';
+    }
+
+    renderQuiz();
+
+    // hash navigation (optional deep-link)
+    if(location.hash){ const id=location.hash.replace('#',''); setTimeout(()=>scrollToId(id), 200); }
+  </script>
 </body>
 </html>
