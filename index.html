@@ -31,7 +31,7 @@
     .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center;padding:48px 24px}
     .hero h1{font-size:38px;line-height:1.2;margin:0}
     .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 12px;background:#1f2937;border:1px solid #263244;border-radius:999px;color:var(--muted);font-size:14px}
-    .cta{display:flex;gap:12px;margin-top:16px}
+    .cta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
     .btn{background:linear-gradient(180deg,var(--brand-2),var(--brand));color:#111;padding:10px 16px;border-radius:12px;border:none;font-weight:700;cursor:pointer}
     .btn.sec{background:#1f2937;color:var(--ink);border:1px solid #263244}
     .card{background:radial-gradient(1200px 300px at -10% -20%, rgba(245,158,11,.15), transparent 40%), #0b1222;border:1px solid #1f2739;border-radius:18px;padding:18px}
@@ -76,6 +76,8 @@
         <a href="#titration">จำลองไทเทรต</a>
         <a href="#quiz">แบบทดสอบ</a>
         <a href="#about">เกี่ยวกับ</a>
+        <!-- ปุ่มบันทึกไฟล์ เพื่อส่งงาน -->
+        <button class="btn sec" style="padding:8px 12px" title="บันทึกหน้านี้เป็นไฟล์ .html" onclick="saveHTML()">บันทึกไฟล์ (.html)</button>
       </div>
     </div>
   </nav>
@@ -89,6 +91,8 @@
       <div class="cta">
         <button class="btn" onclick="scrollToId('calc')">เริ่มคำนวณ pH</button>
         <button class="btn sec" onclick="scrollToId('learn')">อ่านสรุปก่อน</button>
+        <!-- ปุ่มบันทึกไฟล์ตรง Hero อีกตำแหน่ง (เผื่อเจอไม่ยาก) -->
+        <button class="btn sec" onclick="saveHTML()">บันทึกไฟล์ส่งงาน</button>
       </div>
     </div>
     <div class="card">
@@ -220,11 +224,12 @@
           <li>เก็บสถิติคะแนนไว้ที่เบราว์เซอร์ (localStorage)</li>
           <li>โค้ดสะอาด แยกส่วน ฟังก์ชันพร้อมคอมเมนต์</li>
         </ul>
+        <div class="small">คลิกปุ่ม <b>บันทึกไฟล์ (.html)</b> ด้านบน เพื่อดาวน์โหลดหน้านี้เป็นไฟล์พร้อมส่งงาน (ระบบจะบันทึกสถานะปัจจุบัน เช่น ข้อความ ผลคำนวณที่แสดงบนหน้า ฯลฯ)</div>
       </div>
       <div class="card">
         <div><b>วิธีส่งงาน</b></div>
         <ol class="muted">
-          <li>บันทึกไฟล์เป็น <span class="kbd">index.html</span></li>
+          <li>บันทึกไฟล์เป็น <span class="kbd">index.html</span> ด้วยปุ่มบันทึกไฟล์</li>
           <li>อัปโหลดไปยัง GitHub Pages / Netlify หรือเปิดตรง ๆ ในเบราว์เซอร์</li>
           <li>แนบคู่มือผู้ใช้ (สั้น ๆ) และภาพหน้าจอ</li>
         </ol>
@@ -238,6 +243,28 @@
     // ---------- Utilities ----------
     const el = (id)=>document.getElementById(id);
     function scrollToId(id){document.querySelector('#'+id)?.scrollIntoView({behavior:'smooth'})}
+
+    // ---------- ฟังก์ชันบันทึกไฟล์ HTML เพื่อส่งงาน ----------
+    // จะเก็บ DOM ปัจจุบันทั้งหมด แล้วดาวน์โหลดเป็นไฟล์ .html เดียว
+    function saveHTML(){
+      try{
+        // อัปเดตเวลาเซฟไว้ในคอมเมนต์เพื่ออ้างอิงเมื่อส่งงาน
+        const stamp = new Date().toISOString().replace(/[:T]/g,'-').slice(0,19);
+        const comment = `<!-- Exported with ChemStudy Save @ ${stamp} -->\n`;
+        // สร้างสำเนา DOM ปัจจุบัน
+        const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+        const blob = new Blob([comment + html], {type:'text/html;charset=utf-8'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `ChemStudy_${stamp}.html`;
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(a.href);
+        a.remove();
+      }catch(err){
+        alert('ไม่สามารถบันทึกไฟล์ได้: ' + err.message);
+      }
+    }
 
     // ---------- Hero demo plot (titration curve) ----------
     const heroCtx = document.getElementById('heroPlot').getContext('2d');
