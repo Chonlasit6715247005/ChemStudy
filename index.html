@@ -455,19 +455,35 @@
     }
 
     function gradeQuiz(){
-      let score=0;
-      QUIZ.forEach((it,idx)=>{
-        const nodes = document.querySelectorAll(`.answer[data-q="${idx}"]`);
-        nodes.forEach((n,i)=>{
-          if(i===it.a && n.dataset.selected==='1'){ n.classList.add('correct'); score++; }
-          else if(n.dataset.selected==='1'){ n.classList.add('wrong'); }
-        });
-        el(`exp-${idx}`).textContent = 'อธิบาย: '+it.exp;
-      });
-      const msg = `คะแนนของคุณ ${score}/${QUIZ.length}`;
-      el('quizMsg').textContent = msg;
-      try{ localStorage.setItem('chem_quiz_score', String(score)); }catch{}
-    }
+  // ตรวจว่าทำครบทุกข้อหรือยัง
+  const total = QUIZ.length;
+  let answered = 0;
+  for(let i=0; i<total; i++){
+    const picked = document.querySelector(`.answer[data-q="${i}"][data-selected="1"]`);
+    if(picked) answered++;
+  }
+
+  if(answered < total){
+    alert("⚠️ โปรดเลือกคำตอบให้ครบถ้วนก่อนส่ง");
+    return; // ออกก่อน ไม่ตรวจคะแนน
+  }
+
+  // ตรวจคะแนนตามปกติ
+  let score = 0;
+  QUIZ.forEach((it,idx)=>{
+    const nodes = document.querySelectorAll(`.answer[data-q="${idx}"]`);
+    nodes.forEach((n,i)=>{
+      if(i===it.a && n.dataset.selected==='1'){ n.classList.add('correct'); score++; }
+      else if(n.dataset.selected==='1'){ n.classList.add('wrong'); }
+    });
+    el(`exp-${idx}`).textContent = 'อธิบาย: '+it.exp;
+  });
+
+  const msg = `คะแนนของคุณ ${score}/${QUIZ.length}`;
+  el('quizMsg').textContent = msg;
+  try{ localStorage.setItem('chem_quiz_score', String(score)); }catch{}
+}
+
 
     function resetQuiz(){
   try { localStorage.removeItem('chem_quiz_score'); } catch {}
