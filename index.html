@@ -55,20 +55,47 @@
     .nav a{opacity:.9;padding:8px 12px;border-radius:10px}
     .nav a:hover{background:#1f2937}
 
+    /* Responsive Hero */
+    .hero{display:grid;grid-template-columns:1fr;gap:24px;align-items:center;padding:48px 24px}
+    @media (min-width:900px){.hero{grid-template-columns:1.1fr .9fr}}
+    .hero h1{font-size:28px;line-height:1.3;margin:0}
+    @media (min-width:720px){.hero h1{font-size:38px;line-height:1.2}}
+
     .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 12px;background:#1f2937;border:1px solid #263244;border-radius:999px;color:var(--muted);font-size:14px}
+    .cta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
     .btn{background:linear-gradient(180deg,var(--brand-2),var(--brand));color:#111;padding:10px 16px;border-radius:12px;border:none;font-weight:700;cursor:pointer}
     .btn.sec{background:#1f2937;color:var(--ink);border:1px solid #263244}
+    .card{background:radial-gradient(1200px 300px at -10% -20%, rgba(245,158,11,.15), transparent 40%), #0b1222;border:1px solid #1f2739;border-radius:18px;padding:18px;overflow:auto}
+
+    h2.section{font-size:22px;margin:40px 0 16px}
+    @media (min-width:720px){h2.section{font-size:26px}}
+    .grid{display:grid;gap:16px}
+    @media (min-width:900px){.grid.cols-3{grid-template-columns:repeat(3,1fr)}.grid.cols-2{grid-template-columns:repeat(2,1fr)}}
+
+    .accordion summary{cursor:pointer;list-style:none}
+    .accordion summary::-webkit-details-marker{display:none}
+    .accordion .title{display:flex;justify-content:space-between;align-items:center;font-weight:700}
+    .tag{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #2b3750;color:var(--muted)}
+
+    .scale{height:18px;border-radius:999px;background:linear-gradient(90deg,#7c2222,#ef4444,#f59e0b,#22c55e,#3b82f6,#1d4ed8,#312e81)}
+    .marker{position:relative;height:0}
+    .marker span{position:absolute;top:-8px;width:2px;height:34px;background:#fff;border-radius:1px}
+
+    input,select{background:#0f172a;border:1px solid #233147;border-radius:10px;color:var(--ink);padding:10px;width:100%}
+    label{font-size:14px;color:var(--muted)}
+    .row{display:grid;gap:12px}
+    @media (min-width:720px){.row.cols-2{grid-template-columns:1fr 1fr}}
 
     .quiz-q{border-bottom:1px dashed #263244;padding-bottom:12px;margin-bottom:12px}
-    .answer{display:block;margin:6px 0;padding:8px 10px;border-radius:10px;border:1px solid #243349;cursor:pointer;transition:0.2s}
-    .answer:hover{background:#1e293b;}
-    .answer.selected{background:rgba(59,130,246,0.2);border-color:#3b82f6;} /* ✅ สีข้อนี้ที่เลือก */
+    .answer{display:block;margin:6px 0;padding:8px 10px;border-radius:10px;border:1px solid #243349;cursor:pointer}
     .answer.correct{background:rgba(16,185,129,.12);border-color:var(--good)}
     .answer.wrong{background:rgba(239,68,68,.1);border-color:var(--bad)}
     .muted{color:var(--muted)}
-    .small{font-size:12px;color:#93a3ba}
-
     .foot{padding:40px 24px;color:#93a3ba;text-align:center;border-top:1px solid #1f2937}
+    .small{font-size:12px;color:#93a3ba}
+    .kbd{padding:2px 6px;border-radius:6px;border:1px solid #334155;background:#0b1222}
+
+    canvas{display:block;width:100%;height:auto}
   </style>
 </head>
 <body>
@@ -80,55 +107,186 @@
     </div>
   </div>
 
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="navwrap">
+      <div class="logo"><div class="logo-badge">E·L</div> ChemStudy</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a href="#home">หน้าแรก</a>
+        <a href="#learn">สรุปเนื้อหา</a>
+        <a href="#calc">คำนวณ pH</a>
+        <a href="#titration">จำลองไทเทรต</a>
+        <a href="#quiz">แบบทดสอบ</a>
+        <a href="#about">เกี่ยวกับ</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="home" class="container hero">
+    <div>
+      <span class="pill">สื่อการเรียนเคมี • กรด–เบส • pH • ไทเทรชัน</span>
+      <h1>เรียนเคมีให้สนุก เข้าใจไว ด้วยเว็บเดียวครบทั้ง <span style="color:var(--brand)">สรุป</span> <span style="color:var(--good)">คำนวณ</span> และ <span style="color:var(--mid)">แบบทดสอบ</span></h1>
+      <p class="muted">เหมาะสำหรับส่งโปรเจ็ค/ใช้ประกอบการเรียน หน่วยการเรียนรู้: ค่า pH, ทฤษฎีกรด–เบส, การไทเทรต, กราฟ pH-scale แบบโต้ตอบ และ Quiz ตรวจทันที</p>
+      <div class="cta">
+        <button class="btn" onclick="scrollToId('calc')">เริ่มคำนวณ pH</button>
+        <button class="btn sec" onclick="scrollToId('learn')">อ่านสรุปก่อน</button>
+      </div>
+    </div>
+    <div class="card">
+      <canvas id="heroPlot" width="520" height="280" aria-label="pH scale"></canvas>
+      <div class="small" style="margin-top:6px">กราฟตัวอย่าง: โค้งไทเทรตกรดแก่–เบสแก่</div>
+    </div>
+  </section>
+
+  <!-- LEARN -->
+  <section id="learn" class="container">
+    <h2 class="section">📚 สรุปเนื้อหาสำคัญ</h2>
+    <div class="grid cols-3">
+      <details class="card accordion" open>
+        <summary class="title">ค่า pH และ pOH <span class="tag">พื้นฐาน</span></summary>
+        <div class="muted">
+          <ul>
+            <li>นิยาม: <code>pH = -log10[H⁺]</code>, <code>pOH = -log10[OH⁻]</code>, และ <code>pH + pOH = 14</code> (ที่ 25 °C)</li>
+            <li>จำแนกสาร: pH &lt; 7 = กรด, pH = 7 = กลาง, pH &gt; 7 = เบส</li>
+            <li>ความเข้มข้น [H⁺] มีหน่วยเป็น mol·L⁻¹ (M)</li>
+          </ul>
+        </div>
+      </details>
+      <details class="card accordion">
+        <summary class="title">ทฤษฎีกรด–เบส <span class="tag">แนวคิด</span></summary>
+        <div class="muted">
+          <ul>
+            <li>Arrhenius: กรดให้ H⁺ ในสารละลาย, เบสให้ OH⁻</li>
+            <li>Brønsted–Lowry: กรดเป็นผู้ให้โปรตอน, เบสเป็นผู้รับโปรตอน</li>
+            <li>Lewis: กรดรับ e-pair, เบสให้ e-pair</li>
+          </ul>
+        </div>
+      </details>
+      <details class="card accordion">
+        <summary class="title">การไทเทรต (Titration) <span class="tag">ปฏิบัติ</span></summary>
+        <div class="muted">
+          <ul>
+            <li>เป้าหมาย: หาโมล/ความเข้มข้นของสารไม่ทราบค่า ด้วยสารมาตรฐาน</li>
+            <li>จุดสมมูล (Equivalence): โมลกรด = โมลเบส</li>
+            <li>จุดยุติ (Endpoint): ตัวบ่งชี้เปลี่ยนสี ≈ จุดสมมูล</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- INFO SECTION -->
+  <section id="info" class="container">
+    <h2 class="section">🧪 ข้อมูลเบื้องต้นของสาร</h2>
+    <div class="grid cols-3">
+      <div class="card">
+        <b>HCl (กรดไฮโดรคลอริก)</b>
+        <ul class="muted">
+          <li>ชนิด: กรดแก่</li>
+          <li>ค่า pH โดยประมาณ: 1–2</li>
+          <li>สมการแตกตัว: HCl → H⁺ + Cl⁻</li>
+          <li>การใช้งาน: ใช้ในห้องแล็บและการผลิตเคมี</li>
+        </ul>
+      </div>
+      <div class="card">
+        <b>NaOH (โซเดียมไฮดรอกไซด์)</b>
+        <ul class="muted">
+          <li>ชนิด: เบสแก่</li>
+          <li>ค่า pH โดยประมาณ: 13–14</li>
+          <li>สมการแตกตัว: NaOH → Na⁺ + OH⁻</li>
+          <li>การใช้งาน: ใช้ผลิตสบู่, ล้างไขมัน, ปรับค่า pH</li>
+        </ul>
+      </div>
+      <div class="card">
+        <b>CH₃COOH (กรดอะซิติก)</b>
+        <ul class="muted">
+          <li>ชนิด: กรดอ่อน</li>
+          <li>ค่า pH โดยประมาณ: 3–4</li>
+          <li>สมการแตกตัว: CH₃COOH ⇌ CH₃COO⁻ + H⁺</li>
+          <li>การใช้งาน: น้ำส้มสายชู, เคมีอาหาร</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
   <section id="quiz" class="container">
     <h2 class="section">📝 แบบทดสอบสั้น ๆ</h2>
     <div id="quizWrap" class="card"></div>
   </section>
 
+  <!-- ABOUT -->
+  <section id="about" class="container">
+    <h2 class="section">ℹ️ เกี่ยวกับโปรเจ็ค</h2>
+    <div class="grid cols-1">
+      <div class="card">
+        <b>ChemStudy</b> เป็นเว็บสื่อการเรียนรู้เคมีสำหรับหัวข้อกรด–เบสและการไทเทรต เหมาะกับการใช้งานในชั้นเรียน/ส่งงานโปรเจ็ค สามารถรันได้ในไฟล์เดียว (HTML เดียวนี้)
+        <ul class="muted">
+          <li>รองรับออฟไลน์: เปิดไฟล์นี้ก็ใช้งานส่วนใหญ่ได้ทันที</li>
+          <li>เก็บสถิติคะแนนไว้ที่เบราว์เซอร์ (localStorage)</li>
+          <li>โค้ดสะอาด แยกส่วน ฟังก์ชันพร้อมคอมเมนต์</li>
+        </ul>
+        <div class="small">*หมายเหตุ: รองรับการอัปโหลดขึ้น GitHub Pages/Netlify หรือเปิดไฟล์ตรง ๆ ในเบราว์เซอร์</div>
+      </div>
+    </div>
+  </section>
+
   <footer class="foot small">ChemStudy © 2025 • สร้างเพื่อการเรียนรู้</footer>
 
   <script>
+    // ---------- Utilities ----------
     const el = (id)=>document.getElementById(id);
+    function scrollToId(id){document.querySelector('#'+id)?.scrollIntoView({behavior:'smooth'})}
 
+    // ---------- Modal Popup ----------
     function showAlert(msg){
       el('alertText').textContent = msg;
       el('alertModal').style.display = 'flex';
     }
-    el('alertOk').addEventListener('click', ()=> el('alertModal').style.display='none');
+    el('alertOk').addEventListener('click', ()=>{
+      el('alertModal').style.display = 'none';
+    });
 
+    // ---------- QUIZ ----------
     const QUIZ = [
       {q:'นิยามของ pH คือข้อใด', choices:['-log10[H⁺]','log10[H⁺]','-ln[H⁺]','1/[H⁺]'], a:0, exp:'pH = -log10[H⁺] (ฐาน 10)'},
       {q:'ที่ 25°C ค่าคงที่น้ำ (Kw) เท่าไร', choices:['1×10⁻¹²','1×10⁻¹⁴','1×10⁻⁷','1×10¹⁴'], a:1, exp:'Kw = [H⁺][OH⁻] = 1×10⁻¹⁴'},
-      {q:'สารมี pH = 3 จัดเป็น', choices:['เบสอ่อน','กรดแก่','กรด','กลาง'], a:2, exp:'pH<7 เป็นกรด'}
+      {q:'สารมี pH = 3 จัดเป็น', choices:['เบสอ่อน','กรดแก่','กรด','กลาง'], a:2, exp:'pH<7 เป็นกรด (ความแรงไม่ชี้จาก pH อย่างเดียว)'},
+      {q:'ทฤษฎีใดกำหนดกรดคือผู้รับคู่อิเล็กตรอน', choices:['Arrhenius','Brønsted–Lowry','Lewis','None'], a:2, exp:'Lewis acid = electron pair acceptor'},
+      {q:'จุดสมมูลในการไทเทรตคือ', choices:['ตัวบ่งชี้เปลี่ยนสี','โมลกรด = โมลเบส','pH=7 เสมอ','พอดีกับ 25 mL'], a:1, exp:'นิยามคือจำนวนโมลเท่ากัน'},
+      {q:'ถ้ารู้ค่า pOH = 5 ที่ 25°C ค่า pH เท่ากับ', choices:['9','5','7','10'], a:0, exp:'pH = 14 - pOH = 9'},
+      {q:'การเลือกตัวบ่งชี้ (indicator) ควรพิจารณา', choices:['ช่วงเปลี่ยนสีใกล้ช่วงเปลี่ยน pH รวดเร็ว','สีที่ชอบ','ราคาถูกสุด','ยี่ห้อดัง'], a:0, exp:'ต้องสอดคล้องช่วงกระโดดของ pH'},
+      {q:'คู่ใดเป็นกรด–เบสตาม Brønsted–Lowry', choices:['HCl / NaCl','NH₄⁺ / NH₃','H₂O / Cl⁻','Na⁺ / Cl⁻'], a:1, exp:'NH₄⁺ ให้โปรตอน → NH₃ รับโปรตอน'}
     ];
 
     function renderQuiz(){
       const wrap = el('quizWrap');
-      let html='';
+      let html = '';
       QUIZ.forEach((it,idx)=>{
         html += `<div class="quiz-q"><b>ข้อ ${idx+1}.</b> ${it.q}`;
         it.choices.forEach((c,i)=>{
           html += `<label class="answer" data-q="${idx}" data-i="${i}">${String.fromCharCode(65+i)}. ${c}</label>`
         });
-        html += `<div class="small muted" id="exp-${idx}"></div></div>`;
+        html += `<div class="small muted" id="exp-${idx}"></div></div>`
       });
-      html += `<button class="btn" id="submitQuiz">ตรวจคำตอบ</button> 
-               <button class="btn sec" id="resetQuiz">เริ่มใหม่</button> 
-               <span class="muted small" id="quizMsg"></span>`;
-      wrap.innerHTML=html;
+      html += `<button class="btn" id="submitQuiz">ตรวจคำตอบ</button> <button class="btn sec" id="resetQuiz">เริ่มใหม่</button> <span class="muted small" id="quizMsg"></span>`
+      wrap.innerHTML = html;
       wrap.addEventListener('click', onPick, false);
       el('submitQuiz').addEventListener('click', gradeQuiz);
       el('resetQuiz').addEventListener('click', resetQuiz);
+
+      try{
+        const prev = localStorage.getItem('chem_quiz_score');
+        if(prev!=null){ el('quizMsg').textContent = `คะแนนครั้งก่อนของคุณ: ${prev}/${QUIZ.length}`; }
+      }catch{}
     }
 
     function onPick(e){
       const lab = e.target.closest('.answer'); if(!lab) return;
       const q = +lab.dataset.q;
-      document.querySelectorAll(`.answer[data-q="${q}"]`).forEach(n=>{
-        n.classList.remove('selected','correct','wrong');
-        n.dataset.selected='0';
-      });
-      lab.classList.add('selected');
+      document.querySelectorAll(`.answer[data-q="${q}"]`).forEach(n=>{n.classList.remove('correct','wrong'); n.style.outline='none'; n.dataset.selected='0';});
+      lab.style.outline='2px solid #475569';
       lab.dataset.selected='1';
     }
 
@@ -136,21 +294,24 @@
       const total = QUIZ.length;
       let answered = 0;
       for(let i=0;i<total;i++){
-        if(document.querySelector(`.answer[data-q="${i}"][data-selected="1"]`)) answered++;
+        const picked = document.querySelector(`.answer[data-q="${i}"][data-selected="1"]`);
+        if(picked) answered++;
       }
-      if(answered<total){ showAlert("⚠️ โปรดเลือกคำตอบให้ครบถ้วนก่อนส่ง"); return; }
-
+      if(answered < total){
+        showAlert("⚠️ โปรดเลือกคำตอบให้ครบถ้วนก่อนส่ง");
+        return;
+      }
       let score=0;
       QUIZ.forEach((it,idx)=>{
         const nodes=document.querySelectorAll(`.answer[data-q="${idx}"]`);
         nodes.forEach((n,i)=>{
-          n.classList.remove('selected');
-          if(i===it.a && n.dataset.selected==='1'){ n.classList.add('correct'); score++; }
-          else if(n.dataset.selected==='1'){ n.classList.add('wrong'); }
+          if(i===it.a && n.dataset.selected==='1'){n.classList.add('correct');score++;}
+          else if(n.dataset.selected==='1'){n.classList.add('wrong');}
         });
         el(`exp-${idx}`).textContent='อธิบาย: '+it.exp;
       });
-      el('quizMsg').textContent=`คะแนนของคุณ ${score}/${QUIZ.length}`;
+      const msg=`คะแนนของคุณ ${score}/${QUIZ.length}`;
+      el('quizMsg').textContent=msg;
       try{localStorage.setItem('chem_quiz_score',String(score));}catch{}
     }
 
