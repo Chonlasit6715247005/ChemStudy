@@ -470,8 +470,12 @@
     }
 
     function resetQuiz(){
-      renderQuiz(); el('quizMsg').textContent='';
-    }
+  try { localStorage.removeItem('chem_quiz_score'); } catch {}
+  renderQuiz();               // โหลดข้อใหม่
+  el('quizMsg').textContent=''; // ล้างข้อความคะแนน
+  window.scrollTo({ top: el('quizWrap').offsetTop - 80, behavior: 'smooth' }); // เด้งขึ้นไปข้อ 1
+}
+
 
     renderQuiz();
 
