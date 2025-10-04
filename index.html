@@ -5,6 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ChemStudy • สื่อการเรียนเคมี (pH, กรด–เบส, ไทเทรต, Quiz)</title>
   <style>
+        /* --- Modal Popup --- */
+    .modal{
+      position:fixed;
+      top:0;left:0;width:100%;height:100%;
+      background:rgba(0,0,0,0.6);
+      display:flex;justify-content:center;align-items:center;
+      z-index:9999;
+      backdrop-filter:blur(3px);
+    }
+    .modal-content{
+      background:#111827;
+      color:#e5e7eb;
+      padding:24px 32px;
+      border-radius:16px;
+      text-align:center;
+      box-shadow:0 8px 24px rgba(0,0,0,0.5);
+      max-width:320px;
+      width:90%;
+      border:1px solid #334155;
+      animation:fadeIn .25s ease;
+    }
+    @keyframes fadeIn{
+      from{transform:scale(0.9);opacity:0;}
+      to{transform:scale(1);opacity:1;}
+    }
+
     :root{
       --bg:#0f172a;       /* slate-900 */
       --panel:#111827;    /* gray-900 */
@@ -71,9 +97,22 @@
 
     /* Canvas responsive */
     canvas{display:block;width:100%;height:auto}
+    /* เมื่อเลือกช้อย */
+.answer.selected {
+  background: rgba(251,146,60,0.25); /* ส้มอ่อนโปร่งใส */
+  border-color: #f59e0b;             /* เส้นขอบเหลือง */
+  color: #fff3d8;
+}
   </style>
 </head>
 <body>
+  <!-- MODAL ALERT -->
+  <div id="alertModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <p id="alertText">⚠️ โปรดเลือกคำตอบให้ครบถ้วนก่อนส่ง</p>
+      <button class="btn" id="alertOk">ตกลง</button>
+    </div>
+  </div>
   <!-- NAV -->
   <nav class="nav">
     <div class="navwrap">
@@ -146,6 +185,39 @@
       </details>
     </div>
   </section>
+  <!-- INFO SECTION -->
+  <section id="info" class="container">
+    <h2 class="section">🧪 ข้อมูลเบื้องต้นของสาร</h2>
+    <div class="grid cols-3">
+      <div class="card">
+        <b>HCl (กรดไฮโดรคลอริก)</b>
+        <ul class="muted">
+          <li>ชนิด: กรดแก่</li>
+          <li>ค่า pH โดยประมาณ: 1–2</li>
+          <li>สมการแตกตัว: HCl → H⁺ + Cl⁻</li>
+          <li>การใช้งาน: ใช้ในห้องแล็บและการผลิตเคมี</li>
+        </ul>
+      </div>
+      <div class="card">
+        <b>NaOH (โซเดียมไฮดรอกไซด์)</b>
+        <ul class="muted">
+          <li>ชนิด: เบสแก่</li>
+          <li>ค่า pH โดยประมาณ: 13–14</li>
+          <li>สมการแตกตัว: NaOH → Na⁺ + OH⁻</li>
+          <li>การใช้งาน: ใช้ผลิตสบู่, ล้างไขมัน, ปรับค่า pH</li>
+        </ul>
+      </div>
+      <div class="card">
+        <b>CH₃COOH (กรดอะซิติก)</b>
+        <ul class="muted">
+          <li>ชนิด: กรดอ่อน</li>
+          <li>ค่า pH โดยประมาณ: 3–4</li>
+          <li>สมการแตกตัว: CH₃COOH ⇌ CH₃COO⁻ + H⁺</li>
+          <li>การใช้งาน: น้ำส้มสายชู, เคมีอาหาร</li>
+        </ul>
+      </div>
+    </div>
+  </section>
 
   <!-- CALCULATOR -->
   <section id="calc" class="container">
@@ -178,6 +250,58 @@
         <div class="marker"><span id="phMarker" style="left:50%"></span></div>
       </div>
       <div id="phOut" style="margin-top:12px"></div>
+    </div>
+  </section>
+  <!-- INFO SECTION -->
+  <section id="info" class="container">
+    <h2 class="section">🧪 ข้อมูลเบื้องต้นของสาร</h2>
+    <div class="grid cols-3">
+      <div class="card">
+        <b>HCl (กรดไฮโดรคลอริก)</b>
+        <ul class="muted">
+          <li>ชนิด: กรดแก่</li>
+          <li>ค่า pH โดยประมาณ: 1–2</li>
+          <li>สมการแตกตัว: HCl → H⁺ + Cl⁻</li>
+          <li>การใช้งาน: ใช้ในห้องปฏิบัติการและอุตสาหกรรม</li>
+        </ul>
+      </div>
+      <div class="card">
+        <b>NaOH (โซเดียมไฮดรอกไซด์)</b>
+        <ul class="muted">
+          <li>ชนิด: เบสแก่</li>
+          <li>ค่า pH โดยประมาณ: 13–14</li>
+          <li>สมการแตกตัว: NaOH → Na⁺ + OH⁻</li>
+          <li>การใช้งาน: ใช้ผลิตสบู่, น้ำยาล้าง, ปรับค่า pH</li>
+        </ul>
+      </div>
+      <div class="card">
+        <b>CH₃COOH (กรดอะซิติก)</b>
+        <ul class="muted">
+          <li>ชนิด: กรดอ่อน</li>
+          <li>ค่า pH โดยประมาณ: 3–4</li>
+          <li>สมการแตกตัว: CH₃COOH ⇌ CH₃COO⁻ + H⁺</li>
+          <li>การใช้งาน: น้ำส้มสายชู, อาหาร, การหมัก</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- BASIC TITRATION -->
+  <section id="titration-basic" class="container">
+    <h2 class="section">⚗️ การจำลองการไทเทรตเบื้องต้น</h2>
+    <div class="card">
+      <p class="muted">
+        การไทเทรตคือการหาความเข้มข้นของสารไม่ทราบค่า โดยเติมสารมาตรฐานเข้ามาจนถึงจุดสมมูล
+        (equivalence point) ซึ่ง <b>โมลกรด = โมลเบส</b> พอดี
+      </p>
+      <ul class="muted">
+        <li>ตัวอย่าง: ใช้ NaOH 0.1 M ไทเทรต HCl 0.1 M ปริมาตรกรด 25 mL</li>
+        <li>ปริมาตรเบสที่จุดสมมูล ≈ 25 mL</li>
+        <li>ก่อนถึงจุดสมมูล → pH ต่ำ (กรด)</li>
+        <li>ที่จุดสมมูล → pH ≈ 7</li>
+        <li>หลังจุดสมมูล → pH สูง (เบส)</li>
+      </ul>
+      <p class="small muted">*การทดลองจริงควรใช้ตัวบ่งชี้ (indicator) เช่น ฟีนอลฟทาลีน หรือ เมทิลออเรนจ์</p>
     </div>
   </section>
 
@@ -220,10 +344,10 @@
     <div id="quizWrap" class="card"></div>
   </section>
 
-  <!-- ABOUT -->
+    <!-- ABOUT -->
   <section id="about" class="container">
     <h2 class="section">ℹ️ เกี่ยวกับโปรเจ็ค</h2>
-    <div class="grid cols-2">
+    <div class="grid cols-1">
       <div class="card">
         <b>ChemStudy</b> เป็นเว็บสื่อการเรียนรู้เคมีสำหรับหัวข้อกรด–เบสและการไทเทรต เหมาะกับการใช้งานในชั้นเรียน/ส่งงานโปรเจ็ค สามารถรันได้ในไฟล์เดียว (HTML เดียวนี้)
         <ul class="muted">
@@ -233,16 +357,9 @@
         </ul>
         <div class="small">*หมายเหตุ: รองรับการอัปโหลดขึ้น GitHub Pages/Netlify หรือเปิดไฟล์ตรง ๆ ในเบราว์เซอร์</div>
       </div>
-      <div class="card">
-        <div><b>วิธีส่งงาน</b></div>
-        <ol class="muted">
-          <li>บันทึกไฟล์เป็น <span class="kbd">index.html</span></li>
-          <li>อัปโหลดไปยัง GitHub Pages / Netlify หรือเปิดไฟล์ตรง ๆ ในเบราว์เซอร์</li>
-          <li>แนบคู่มือผู้ใช้ (สั้น ๆ) และภาพหน้าจอ</li>
-        </ol>
-      </div>
     </div>
   </section>
+
 
   <footer class="foot small">ChemStudy © 2025 • สร้างเพื่อการเรียนรู้</footer>
 
@@ -402,31 +519,66 @@
     }
 
     function onPick(e){
-      const lab = e.target.closest('.answer'); if(!lab) return;
-      const q = +lab.dataset.q, i = +lab.dataset.i;
-      document.querySelectorAll(`.answer[data-q="${q}"]`).forEach(n=>{n.classList.remove('correct','wrong'); n.style.outline='none'; n.dataset.selected='0';});
-      lab.style.outline='2px solid #475569';
-      lab.dataset.selected='1';
-    }
+  const lab = e.target.closest('.answer'); 
+  if(!lab) return;
+
+  const q = +lab.dataset.q;
+  // ล้างสถานะเลือกเก่าก่อน
+  document.querySelectorAll(`.answer[data-q="${q}"]`).forEach(n=>{
+    n.classList.remove('selected','correct','wrong');
+    n.dataset.selected='0';
+  });
+  // ใส่คลาส selected ให้ช้อยที่เลือก
+  lab.classList.add('selected');
+  lab.dataset.selected='1';
+}
+
+function showAlert(msg){
+  el('alertText').textContent = msg;
+  el('alertModal').style.display = 'flex';
+}
+el('alertOk').addEventListener('click', ()=>{
+  el('alertModal').style.display = 'none';
+});
 
     function gradeQuiz(){
-      let score=0;
-      QUIZ.forEach((it,idx)=>{
-        const nodes = document.querySelectorAll(`.answer[data-q="${idx}"]`);
-        nodes.forEach((n,i)=>{
-          if(i===it.a && n.dataset.selected==='1'){ n.classList.add('correct'); score++; }
-          else if(n.dataset.selected==='1'){ n.classList.add('wrong'); }
-        });
-        el(`exp-${idx}`).textContent = 'อธิบาย: '+it.exp;
-      });
-      const msg = `คะแนนของคุณ ${score}/${QUIZ.length}`;
-      el('quizMsg').textContent = msg;
-      try{ localStorage.setItem('chem_quiz_score', String(score)); }catch{}
-    }
+  // ตรวจว่าทำครบทุกข้อหรือยัง
+  const total = QUIZ.length;
+  let answered = 0;
+  for(let i=0; i<total; i++){
+    const picked = document.querySelector(`.answer[data-q="${i}"][data-selected="1"]`);
+    if(picked) answered++;
+  }
+
+  if(answered < total){
+    showAlert("⚠️ โปรดเลือกคำตอบให้ครบถ้วนก่อนส่ง");
+    return; // ออกก่อน ไม่ตรวจคะแนน
+  }
+
+  // ตรวจคะแนนตามปกติ
+  let score = 0;
+  QUIZ.forEach((it,idx)=>{
+    const nodes = document.querySelectorAll(`.answer[data-q="${idx}"]`);
+    nodes.forEach((n,i)=>{
+      if(i===it.a && n.dataset.selected==='1'){ n.classList.add('correct'); score++; }
+      else if(n.dataset.selected==='1'){ n.classList.add('wrong'); }
+    });
+    el(`exp-${idx}`).textContent = 'อธิบาย: '+it.exp;
+  });
+
+  const msg = `คะแนนของคุณ ${score}/${QUIZ.length}`;
+  el('quizMsg').textContent = msg;
+  try{ localStorage.setItem('chem_quiz_score', String(score)); }catch{}
+}
+
 
     function resetQuiz(){
-      renderQuiz(); el('quizMsg').textContent='';
-    }
+  try { localStorage.removeItem('chem_quiz_score'); } catch {}
+  renderQuiz();               // โหลดข้อใหม่
+  el('quizMsg').textContent=''; // ล้างข้อความคะแนน
+  window.scrollTo({ top: el('quizWrap').offsetTop - 80, behavior: 'smooth' }); // เด้งขึ้นไปข้อ 1
+}
+
 
     renderQuiz();
 
