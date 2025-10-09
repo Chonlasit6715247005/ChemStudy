@@ -6,6 +6,9 @@
   <title>ChemStudy • สื่อการเรียนเคมี (pH, กรด–เบส, ไทเทรต, Quiz)</title>
   <style>
         /* --- Modal Popup --- */
+    /* ให้ข้อความในป๊อปอัพขึ้นบรรทัดใหม่ได้เมื่อมี \n */
+#alertText{ white-space: pre-line; }
+
     .modal{
       position:fixed;
       top:0;left:0;width:100%;height:100%;
@@ -151,6 +154,7 @@
   <section id="learn" class="container">
     <h2 class="section">📚 สรุปเนื้อหาสำคัญ</h2>
     <div class="grid cols-3">
+      <!-- ค่า pH และ pOH -->
       <details class="card accordion" open>
         <summary class="title">ค่า pH และ pOH <span class="tag">พื้นฐาน</span></summary>
         <div class="muted">
@@ -162,24 +166,27 @@
         </div>
       </details>
 
-      <details class="card accordion">
+      <!-- ทฤษฎีกรด–เบส (เปิดโชว์เลย) -->
+      <details class="card accordion" open>
         <summary class="title">ทฤษฎีกรด–เบส <span class="tag">แนวคิด</span></summary>
         <div class="muted">
           <ul>
-            <li>Arrhenius: กรดให้ H⁺ ในสารละลาย, เบสให้ OH⁻</li>
-            <li>Brønsted–Lowry: กรดเป็นผู้ให้โปรตอน, เบสเป็นผู้รับโปรตอน</li>
-            <li>Lewis: กรดรับ e-pair, เบสให้ e-pair</li>
+            <li><b>Arrhenius:</b> กรดให้ H⁺ ในสารละลาย, เบสให้ OH⁻</li>
+            <li><b>Brønsted–Lowry:</b> กรดเป็นผู้ให้โปรตอน, เบสเป็นผู้รับโปรตอน</li>
+            <li><b>Lewis:</b> กรดรับคู่อิเล็กตรอน, เบสให้คู่อิเล็กตรอน</li>
           </ul>
         </div>
       </details>
 
-      <details class="card accordion">
+      <!-- การไทเทรต (Titration) (เปิดโชว์เลย) -->
+      <details class="card accordion" open>
         <summary class="title">การไทเทรต (Titration) <span class="tag">ปฏิบัติ</span></summary>
         <div class="muted">
           <ul>
-            <li>เป้าหมาย: หาโมล/ความเข้มข้นของสารไม่ทราบค่า ด้วยสารมาตรฐาน</li>
-            <li>จุดสมมูล (Equivalence): โมลกรด = โมลเบส</li>
-            <li>จุดยุติ (Endpoint): ตัวบ่งชี้เปลี่ยนสี ≈ จุดสมมูล</li>
+            <li><b>เป้าหมาย:</b> หาโมลหรือความเข้มข้นของสารที่ไม่ทราบค่า ด้วยสารมาตรฐาน</li>
+            <li><b>จุดสมมูล (Equivalence Point):</b> โมลกรด = โมลเบส</li>
+            <li><b>จุดยุติ (End Point):</b> จุดที่ตัวบ่งชี้ (Indicator) เปลี่ยนสี ≈ จุดสมมูล</li>
+            <li><b>ตัวอย่าง:</b> ใช้ NaOH 0.1 M ไทเทรต HCl 0.1 M จะเกิดจุดสมมูลที่ pH ≈ 7</li>
           </ul>
         </div>
       </details>
@@ -536,7 +543,15 @@ el('alertOk').addEventListener('click', ()=>{
   const msg = `คะแนนของคุณ ${score}/${QUIZ.length}`;
   el('quizMsg').textContent = msg;
   try{ localStorage.setItem('chem_quiz_score', String(score)); }catch{}
+
+  // ✅ แสดงคะแนนเป็นป๊อปอัพ
+  // (ขึ้นบรรทัดใหม่ได้เพราะเราเพิ่ม CSS white-space: pre-line ไว้แล้ว)
+  const detail = score === total
+    ? "เยี่ยมมาก! ทำถูกทั้งหมด 🎉"
+    : (score >= Math.ceil(total*0.7) ? "ดีมาก! ใกล้สมบูรณ์แล้ว ✅" : "สู้ต่อ! ลองทบทวนอธิบายใต้แต่ละข้อดูนะ 💡");
+  showAlert(`ผลการทำแบบทดสอบ\n${score} / ${QUIZ.length}\n${detail}`);
 }
+
 
 
     function resetQuiz(){
@@ -550,7 +565,133 @@ el('alertOk').addEventListener('click', ()=>{
     renderQuiz();
 
     if(location.hash){ const id=location.hash.replace('#',''); setTimeout(()=>scrollToId(id), 200); }
+    // ===== [ADD-ON] ฟังก์ชันวาดกริดและป้ายจุดสมดุล =====
+
+// วาดกริดหลังกราฟ
+function drawGrid(ctx, W, H, {xMin=0, xMax=100, yMin=0, yMax=14, xTicks=10, yTicks=14}={}){
+  const L=40, T=20, R=W-20, B=H-40;
+  const width = R-L, height = B-T;
+
+  ctx.save();
+  ctx.strokeStyle = '#263244';
+  ctx.lineWidth = 1;
+  ctx.globalAlpha = 0.35;
+
+  // แนวตั้ง + ป้ายแกน X
+  for(let i=0;i<=xTicks;i++){
+    const x = L + (i/xTicks)*width;
+    ctx.beginPath(); ctx.moveTo(x, T); ctx.lineTo(x, B); ctx.stroke();
+
+    const v = xMin + (i/xTicks)*(xMax-xMin);
+    ctx.globalAlpha = 0.8; ctx.fillStyle = '#93a3ba'; ctx.font='12px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText(v.toFixed(0), x, H-22);
+    ctx.globalAlpha = 0.35;
+  }
+
+  // แนวนอน + ป้ายแกน Y
+  for(let j=0;j<=yTicks;j++){
+    const y = B - (j/yTicks)*height;
+    ctx.beginPath(); ctx.moveTo(L, y); ctx.lineTo(R, y); ctx.stroke();
+
+    const v = yMin + (j/yTicks)*(yMax-yMin);
+    ctx.globalAlpha = 0.8; ctx.fillStyle = '#93a3ba'; ctx.font='12px system-ui';
+    ctx.textAlign = 'right';
+    ctx.fillText(v.toFixed(0), 36, y+4);
+    ctx.globalAlpha = 0.35;
+  }
+  ctx.restore();
+}
+
+// วาดเส้นกราฟซ้ำให้อยู่หน้ากริด
+function redrawTitrationCurve(ctx, W, H, Ca, Va, Cb){
+  const L=40, T=20, R=W-20, B=H-40;
+  const Vmax = Va*2.2;
+  const x2px = v=>L + v/Vmax*(R-L);
+  const y2px = v=> B - Math.max(0,Math.min(14,v))/14*(B-T);
+
+  const N=160;
+  ctx.beginPath(); ctx.lineWidth=2; ctx.strokeStyle='#f59e0b';
+  for(let i=0;i<N;i++){
+    const Vb=i/(N-1)*Vmax;
+    const pH=pHstrongAcidBase(Ca,Va,Cb,Vb);
+    const px=x2px(Vb), py=y2px(pH);
+    if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+
+  // วาดกรอบ/ป้ายแกน
+  ctx.strokeStyle='#334155'; ctx.lineWidth=1; ctx.strokeRect(L,T,R-L,B-T);
+  ctx.fillStyle='#93a3ba'; ctx.font='12px system-ui';
+  ctx.textAlign='left';
+  ctx.fillText('pH', 8, 28);
+  ctx.textAlign='left';
+  ctx.fillText('Vb (mL)', W-66, H-16);
+}
+
+// ใส่เส้นประ + จุด + ป้ายจุดสมดุล
+function drawEquilibriumLabel(ctx, W, H, Ca, Va, Cb){
+  const L=40, T=20, R=W-20, B=H-40;
+  const Vmax = Va*2.2;
+  const x2px = v=>L + v/Vmax*(R-L);
+  const y2px = v=> B - Math.max(0,Math.min(14,v))/14*(B-T);
+
+  const Veq=(Ca*Va)/Cb;
+  const pH_eq = pHstrongAcidBase(Ca,Va,Cb,Veq);
+  const ex=x2px(Veq), ey=y2px(pH_eq);
+
+  // เส้นประแนวตั้ง Veq
+  ctx.setLineDash([4,4]); ctx.strokeStyle='#475569';
+  ctx.beginPath(); ctx.moveTo(ex, T); ctx.lineTo(ex, B); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // จุดเน้น
+  ctx.fillStyle = '#fb923c';
+  ctx.beginPath(); ctx.arc(ex, ey, 4, 0, Math.PI*2); ctx.fill();
+
+  // กล่องแสดงค่า Veq และ pH
+  const label = `Veq ≈ ${Veq.toFixed(2)} mL, pH ≈ ${pH_eq.toFixed(2)}`;
+  ctx.font='12px system-ui';
+  const textW = ctx.measureText(label).width + 10, textH = 20;
+  let boxX = Math.min(Math.max(ex + 8, L+4), R - textW - 4);
+  let boxY = Math.min(Math.max(ey - 28, T+4), B - textH - 4);
+
+  ctx.fillStyle = 'rgba(17,24,39,0.85)';
+  ctx.strokeStyle = '#334155';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.rect(boxX, boxY, textW, textH); ctx.fill(); ctx.stroke();
+
+  ctx.fillStyle = '#e5e7eb';
+  ctx.fillText(label, boxX+5, boxY+14);
+
+  // ป้ายเล็กใต้แกน X
+  ctx.fillStyle='#93a3ba';
+  ctx.textAlign='center';
+  ctx.fillText(`Veq≈${Veq.toFixed(2)}`, ex, H-6);
+  ctx.textAlign='left';
+}
+
+// ===== [ADD-ON] ครอบ plotCurve เดิม =====
+(function(){
+  const prevPlot = plotCurve;
+  plotCurve = function(){
+    // เรียกฟังก์ชันเดิมทั้งหมดก่อน
+    prevPlot();
+
+    // แล้วเพิ่มกริด + ป้ายจุดสมดุล
+    const Ca = parseFloat(document.getElementById('Ca').value);
+    const Va = parseFloat(document.getElementById('Va').value);
+    const Cb = parseFloat(document.getElementById('Cb').value);
+    const canvas = document.getElementById('titPlot');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.clientWidth, H = parseInt(canvas.style.height,10);
+
+    drawGrid(ctx, W, H, {xMin:0, xMax:Va*2.2, yMin:0, yMax:14, xTicks:10, yTicks:14});
+    redrawTitrationCurve(ctx, W, H, Ca, Va, Cb);
+    drawEquilibriumLabel(ctx, W, H, Ca, Va, Cb);
+  };
+})();
+
   </script>
 </body>
 </html>
-รันโค้ดนี้
